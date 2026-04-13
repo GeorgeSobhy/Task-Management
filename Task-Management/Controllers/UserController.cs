@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using TaskManagement.Shared.Enums;
 namespace Task_Management.Controllers
 {
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/admin/users")]
     public class AdminUsersController : ControllerBase
@@ -30,8 +31,7 @@ namespace Task_Management.Controllers
                 .ToList();
 
 
-            var user = await _userManager.GetUserAsync(User);
-            return Ok(await _userManager.GetRolesAsync(user!));
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
