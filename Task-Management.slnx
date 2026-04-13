@@ -3,4 +3,5 @@
   <Project Path="TaskManagement.BusinessLogic/TaskManagement.BusinessLogic.csproj" />
   <Project Path="TaskManagement.Domain/TaskManagement.Domain.csproj" />
   <Project Path="TaskManagement.Infrastructure/TaskManagement.Infrastructure.csproj" />
+  <Project Path="TaskManagement.Shared/TaskManagement.Shared.csproj" Id="c57bb69a-3303-47ba-b967-8bfd8091eb41" />
 </Solution>
