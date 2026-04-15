@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
@@ -22,11 +22,11 @@ namespace TaskManagement.Infrastructure.JWT
 
             var claims = new List<Claim>
     {
-        new Claim(ClaimTypes.NameIdentifier, userId),
-        new Claim(ClaimTypes.Email, email)
+        new Claim("sub", userId),
+        new Claim("email", email)
     };
 
-            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+            claims.AddRange(roles.Select(r => new Claim("role", r)));
 
             var token = new JwtSecurityToken(
                 issuer: _jwt.Issuer,

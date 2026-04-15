@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using TaskManagement.Domain.Entities.Identity;
 using TaskManagement.Shared.Enums;
 
@@ -37,7 +37,6 @@ namespace TaskManagement.API.Seeding
                 UserName = "admin@example.com",
                 Email = "admin@example.com",
                 EmailConfirmed = true
-                ,
             };
 
             var user = await userManager.FindByEmailAsync(defaultUser.Email.ToLower());
@@ -45,10 +44,13 @@ namespace TaskManagement.API.Seeding
             if (user == null)
             {
                 await userManager.CreateAsync(defaultUser, "Admin@123");
-                await userManager.AddToRoleAsync(defaultUser, DefaultRoles.NewUser.ToString());
-
+                user = defaultUser;
             }
 
+            if (!await userManager.IsInRoleAsync(user, DefaultRoles.Admin.ToString()))
+            {
+                await userManager.AddToRoleAsync(user, DefaultRoles.Admin.ToString());
+            }
         }
     }
 }

@@ -75,6 +75,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.MapInboundClaims = false;
+
     var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 
     options.TokenValidationParameters = new TokenValidationParameters
@@ -88,7 +90,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(jwtSettings.Key)
         ),
-        RoleClaimType = ClaimTypes.Role
+        RoleClaimType = "role"
     };
 
 });
