@@ -129,8 +129,12 @@ namespace Task_Management.Controllers
 
             if (orginal.UserId != User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
                 return new StatusCodeResult(StatusCodes.Status403Forbidden);
+            orginal.Title = task.Title;
+            orginal.Description = task.Description;
+            orginal.Status = task.Status;
+            orginal.Priority = task.Priority;
 
-            await _taskRepository.UpdateAsync(_mapper.Map<AppTask>(task));
+            await _taskRepository.UpdateAsync(orginal);
 
             return Ok(new { message = "Task status updated successfully" });
         }

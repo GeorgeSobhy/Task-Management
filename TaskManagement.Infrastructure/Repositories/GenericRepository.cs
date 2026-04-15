@@ -42,11 +42,19 @@ namespace TaskManagement.Infrastructure.Repositories
         }
         public async System.Threading.Tasks.Task UpdateAsync(T entity)
         {
+            var entry = context.Entry(entity);
 
-            DbSet.Attach(entity);
-            context.Entry(entity).State = EntityState.Modified;
+            if (entry.State == EntityState.Detached)
+            {
+                DbSet.Attach(entity);
+            }
+
+            // Set the state to modified
+            entry.State = EntityState.Modified;
+
             entity.ModificationDate = DateTime.UtcNow;
             entity.ModificationUser = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email) ?? "N/A";
+
             await context.SaveChangesAsync();
         }
         public async System.Threading.Tasks.Task RemoveAsync(T entity)

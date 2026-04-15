@@ -209,7 +209,7 @@ namespace TaskManagement.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AppTask");
+                    b.ToTable("AppTask", (string)null);
                 });
 
             modelBuilder.Entity("TaskManagement.Domain.Entities.Identity.ApplicationUser", b =>

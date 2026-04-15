@@ -13,12 +13,14 @@ namespace TaskManagement.API.Controllers
     public class AdminUsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IAuthService _authService;
 
-        public AdminUsersController(UserManager<ApplicationUser> userManager, IAuthService authService)
+        public AdminUsersController(UserManager<ApplicationUser> userManager, IAuthService authService, Microsoft.AspNetCore.Identity.RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _authService = authService;
+            _roleManager = roleManager;
         }
 
         [HttpPost("register")]
@@ -94,6 +96,9 @@ namespace TaskManagement.API.Controllers
 
             if (user == null)
                 return NotFound("User not found");
+
+            if(await _roleManager.FindByNameAsync(role) == null)
+                return NotFound("Role not found");
 
             var result = await _userManager.AddToRoleAsync(user, role);
 
