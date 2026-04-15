@@ -90,7 +90,8 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(jwtSettings.Key)
         ),
-        RoleClaimType = "role"
+        RoleClaimType = "role",
+        NameClaimType = "sub"
     };
 
 });

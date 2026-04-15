@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +38,7 @@ namespace Task_Management.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] AppTaskCreateUpdateModel request)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst("sub")?.Value;
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
             var isDuplicate = await _taskService.IsDuplicateAsync(request.Title, userId, DateTime.UtcNow.Date);
@@ -87,7 +87,7 @@ namespace Task_Management.Controllers
             if (task == null)
                 return NotFound(new { message = "Task not found" });
 
-            if (task.UserId != User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
+            if (task.UserId != User.FindFirst("sub")?.Value)
                 return Forbid();
 
             return Ok(_mapper.Map<AppTaskModel>(task));
@@ -96,7 +96,9 @@ namespace Task_Management.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllTasks()
         {
-            var tasks = await _taskRepository.GetMany().Where(t => t.UserId == User.FindFirst(ClaimTypes.NameIdentifier)!.Value).ToListAsync();
+            var userId = User.FindFirst("sub")?.Value;
+
+            var tasks = await _taskRepository.GetMany().Where(t => t.UserId == userId).ToListAsync();
 
             return Ok(_mapper.Map<IEnumerable<AppTaskModel>>(tasks));
         }
@@ -108,7 +110,7 @@ namespace Task_Management.Controllers
             if (original == null)
                 return NotFound(new { message = "Task not found" });
 
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst("sub")?.Value;
             if (original.UserId != userId)
                 return Forbid();
 
@@ -127,7 +129,7 @@ namespace Task_Management.Controllers
             if (orginal == null)
                 return NotFound(new { message = "Task not found" });
 
-            if (orginal.UserId != User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
+            if (orginal.UserId != User.FindFirst("sub")?.Value)
                 return new StatusCodeResult(StatusCodes.Status403Forbidden);
             orginal.Title = task.Title;
             orginal.Description = task.Description;
@@ -145,7 +147,7 @@ namespace Task_Management.Controllers
             if (orginal == null)
                 return NotFound(new { message = "Task not found" });
 
-            if (orginal.UserId != User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
+            if (orginal.UserId != User.FindFirst("sub")?.Value)
                 return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
             await _taskRepository.DeleteByIdAsync(id);
