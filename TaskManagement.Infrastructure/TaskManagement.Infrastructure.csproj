@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="BackgroundServices\" />
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
@@ -28,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TaskManagement.BusinessLogic\TaskManagement.BusinessLogic.csproj" />
+    <ProjectReference Include="..\TaskManagement.Domain\TaskManagement.Domain.csproj" />
     <ProjectReference Include="..\TaskManagement.Shared\TaskManagement.Shared.csproj" />
   </ItemGroup>
 

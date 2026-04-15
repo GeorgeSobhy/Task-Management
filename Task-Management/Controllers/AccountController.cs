@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskManagement.BusinessLogic.DTOs;
 using TaskManagement.Infrastructure.Auth;
 
-namespace Task_Management.Controllers
+namespace TaskManagement.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -26,16 +26,6 @@ namespace Task_Management.Controllers
                 token
             });
         }
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto request)
-        {
-            var token = await _authService.RegisterAsync(request);
 
-            return Ok(new
-            {
-                message = "User registered successfully",
-                token
-            });
-        }
     }
 }

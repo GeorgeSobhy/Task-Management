@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using TaskManagement.Shared.Enums;
-namespace Task_Management.Controllers
+using Microsoft.AspNetCore.Mvc;
+using TaskManagement.BusinessLogic.DTOs;
+using TaskManagement.Domain.Entities.Identity;
+using TaskManagement.Infrastructure.Auth;
+namespace TaskManagement.API.Controllers
 {
 
     [Authorize(Roles = "Admin")]
@@ -10,11 +12,25 @@ namespace Task_Management.Controllers
     [Route("api/admin/users")]
     public class AdminUsersController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthService _authService;
 
-        public AdminUsersController(UserManager<IdentityUser> userManager)
+        public AdminUsersController(UserManager<ApplicationUser> userManager, IAuthService authService)
         {
             _userManager = userManager;
+            _authService = authService;
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto request)
+        {
+            var token = await _authService.RegisterAsync(request);
+
+            return Ok(new
+            {
+                message = "User registered successfully",
+                token
+            });
         }
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
@@ -59,7 +75,9 @@ namespace Task_Management.Controllers
             if (user == null)
                 return NotFound("User not found");
 
-            var result = await _userManager.DeleteAsync(user);
+            user.IsDeleted = true;
+            user.DeletionDate = DateTime.Now;
+            var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)
                 return BadRequest(result.Errors);

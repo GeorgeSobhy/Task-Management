@@ -1,18 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using TaskManagement.Domain.Entities.Identity;
 using TaskManagement.Shared.Enums;
 
 namespace TaskManagement.API.Seeding
 {
     public class SeedingDefaultUsers
     {
-        private readonly UserManager<IdentityUser> userManager;
-        public SeedingDefaultUsers(UserManager<IdentityUser> userManager)
+        private readonly UserManager<ApplicationUser> userManager;
+        public SeedingDefaultUsers(UserManager<ApplicationUser> userManager)
         {
             this.userManager = userManager;
         }
         public async Task SeedBasicUserAsync()
         {
-            var defaultUser = new IdentityUser
+            var defaultUser = new ApplicationUser
             {
                 UserName = "basicuser@example.com",
                 Email = "basicuser@example.com",
@@ -31,7 +32,7 @@ namespace TaskManagement.API.Seeding
 
         public async Task SeedSuperAdminUserAsync()
         {
-            var defaultUser = new IdentityUser
+            var defaultUser = new ApplicationUser
             {
                 UserName = "admin@example.com",
                 Email = "admin@example.com",

@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,9 +8,16 @@ using System.Security.Claims;
 using System.Text;
 using Task_Management.Middlewares;
 using TaskManagement.API.Seeding;
+using TaskManagement.BusinessLogic.Interfaces;
+using TaskManagement.BusinessLogic.Mapping;
+using TaskManagement.BusinessLogic.Services;
+using TaskManagement.Domain.Entities.Identity;
+using TaskManagement.Domain.Interfaces;
 using TaskManagement.Infrastructure.Auth;
+using TaskManagement.Infrastructure.BackgroundServices;
 using TaskManagement.Infrastructure.JWT;
 using TaskManagement.Infrastructure.Persistence;
+using TaskManagement.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +64,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         }
     ));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -82,16 +90,26 @@ builder.Services.AddAuthentication(options =>
         ),
         RoleClaimType = ClaimTypes.Role
     };
+
+});
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "TaskApp_";
 });
 
-
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<GeneralProfile>());
 
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("Jwt")
 );
+builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+builder.Services.AddHostedService<TaskProcessingWorker>(); 
 
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IAppTaskService, AppTaskService>();
 builder.Services.AddScoped<SeedingDefaultRoles>();
 builder.Services.AddScoped<SeedingDefaultUsers>();
 

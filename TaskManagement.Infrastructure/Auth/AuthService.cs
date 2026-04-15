@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using TaskManagement.BusinessLogic.DTOs;
+using TaskManagement.Domain.Entities.Identity;
 using TaskManagement.Infrastructure.JWT;
 using TaskManagement.Shared.Enums;
 using TaskManagement.Shared.Exceptions;
@@ -14,13 +16,13 @@ namespace TaskManagement.Infrastructure.Auth
 
     public class AuthService : IAuthService
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly JwtService _jwtService;
 
         public AuthService(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             JwtService jwtService)
         {
             _userManager = userManager;
@@ -30,12 +32,13 @@ namespace TaskManagement.Infrastructure.Auth
 
         public async Task<string> RegisterAsync(RegisterDto request)
         {
+
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
 
             if (existingUser != null)
                 throw new UserAlreadyExistsException(request.Email);
 
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = request.Email,
                 Email = request.Email
@@ -46,7 +49,7 @@ namespace TaskManagement.Infrastructure.Auth
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception(errors);
+                throw new GenericException(errors, StatusCodes.Status400BadRequest);
             }
 
             return _jwtService.GenerateToken(user.Id, user.Email!,new List<string>() { DefaultRoles.NewUser.ToString() });
